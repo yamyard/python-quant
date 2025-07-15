@@ -12,7 +12,7 @@ i = SignalUnit(
     value="buy",
     timestamp="2025-07-15 09:00:00",
     source="news",
-    comment="some commet"
+    comment="some comment"
 )
 save_signal(i)
 
