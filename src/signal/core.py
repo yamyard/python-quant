@@ -1,7 +1,7 @@
 from dataclasses import dataclass, asdict
 
 @dataclass
-class Signal:
+class SignalUnit:
     id: str
     symbol: str
     value: str
