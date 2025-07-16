@@ -1,10 +1,9 @@
-# backend/api/main.py
 from fastapi import FastAPI, WebSocket
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 import asyncio
 
-from chart.core import KlineGenerator
+from src.chart.core import KlineGenerator
 
 app = FastAPI()
 

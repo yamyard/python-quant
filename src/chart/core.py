@@ -1,4 +1,3 @@
-# backend/chart/core.py
 import random
 from datetime import datetime, timedelta
 
