@@ -1,11 +1,14 @@
 import requests
-from fastapi import FastAPI
+from fastapi import FastAPI, Body
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
 import asyncio
 import websockets
 import json
+
+from src.signal.core import SignalUnit
+from src.signal.redis import save_signal, get_signal, delete_signal, RedisInstance
 
 app = FastAPI()
 
@@ -77,5 +80,45 @@ async def websocket_endpoint(websocket: WebSocket):
 @app.on_event("startup")
 async def startup_event():
     asyncio.create_task(binance_ws_handler())
+
+# Signal相关接口
+
+@app.post("/api/signal")
+def api_save_signal(signal: dict = Body(...)):
+    # signal 字段必须包含全部 SignalUnit 属性
+    try:
+        signal_unit = SignalUnit.from_dict(signal)
+    except Exception as e:
+        return {"error": f"Invalid SignalUnit data: {e}"}
+    save_signal(signal_unit)
+    return {"success": True, "id": signal_unit.id}
+
+@app.get("/api/signal/{signal_id}")
+def api_get_signal(signal_id: str):
+    try:
+        signal_unit = get_signal(signal_id)
+    except Exception as e:
+        return {"error": f"Signal not found: {e}"}
+    return signal_unit.to_dict()
+
+@app.delete("/api/signal/{signal_id}")
+def api_delete_signal(signal_id: str):
+    delete_signal(signal_id)
+    return {"success": True, "id": signal_id}
+
+@app.get("/api/signals")
+def api_get_signals():
+    # 扫描所有 SignalRedis:* 键
+    keys = RedisInstance.keys("SignalRedis:*")
+    signals = []
+    for key in keys:
+        signal_dict = RedisInstance.hgetall(key)
+        # decode bytes
+        signal_dict = {k.decode(): v.decode() for k, v in signal_dict.items()}
+        try:
+            signals.append(SignalUnit.from_dict(signal_dict).to_dict())
+        except Exception:
+            pass
+    return signals
 
 app.mount("/", StaticFiles(directory="web", html=True), name="web")

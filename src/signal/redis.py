@@ -12,3 +12,7 @@ def get_signal(signal_id: str) -> SignalUnit:
     signal_dict = RedisInstance.hgetall(key)
     signal_dict = {k.decode(): v.decode() for k, v in signal_dict.items()}
     return SignalUnit.from_dict(signal_dict)
+
+def delete_signal(signal_id: str):
+    key = f"SignalRedis:{signal_id}"
+    RedisInstance.delete(key)

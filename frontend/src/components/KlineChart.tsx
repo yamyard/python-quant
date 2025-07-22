@@ -11,8 +11,18 @@ interface Kline {
   close: number;
 }
 
+interface SignalUnit {
+  id: string;
+  symbol: string;
+  value: string;
+  timestamp: string;
+  source: string;
+  comment: string;
+}
+
 const KlineChart: React.FC = () => {
   const [data, setData] = useState<Kline[]>([]);
+  const [signals, setSignals] = useState<SignalUnit[]>([]);
   const [layout, setLayout] = useState<any>({
     title: "BTCUSDT 实时 1m K线图",
     xaxis: { type: "date" },
@@ -48,6 +58,19 @@ const KlineChart: React.FC = () => {
     return () => ws.close();
   }, []);
 
+  // 拉取所有信号数据
+  useEffect(() => {
+    const fetchSignals = () => {
+      axios.get("http://localhost:8000/api/signals")
+        .then(res => setSignals(res.data))
+        .catch(console.error);
+    };
+    fetchSignals();
+    // 定时刷新信号
+    const interval = setInterval(fetchSignals, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   const handleRelayout = (event: any) => {
     if (!isInitialLoad.current) {
       setLayout((prevLayout: any) => ({
@@ -62,6 +85,20 @@ const KlineChart: React.FC = () => {
       isInitialLoad.current = false;
     }
   }, [data]);
+
+  // 转换信号为Plotly annotations
+  const annotations = signals.map(sig => ({
+    x: new Date(Number(sig.timestamp)),
+    y: sig.value ? Number(sig.value) : undefined,
+    text: `${sig.symbol}: ${sig.value}\n${sig.comment || ""}`,
+    showarrow: true,
+    arrowhead: 4,
+    ax: 0,
+    ay: -40,
+    bgcolor: "#ffe082",
+    bordercolor: "#1976d2",
+    font: { color: "#1976d2", size: 12 },
+  }));
 
   return (
     <Rnd
@@ -107,7 +144,13 @@ const KlineChart: React.FC = () => {
                 type: "candlestick",
               }
             ]}
-            layout={{ ...layout, autosize: true, width: undefined, height: undefined }}
+            layout={{
+              ...layout,
+              autosize: true,
+              width: undefined,
+              height: undefined,
+              annotations: annotations,
+            }}
             onRelayout={handleRelayout}
             useResizeHandler
             style={{ width: "100%", height: "100%" }}
