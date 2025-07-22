@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
-import Plot from "react-plotly.js";
+
 import axios from "axios";
+import Plot from "react-plotly.js";
 import { Rnd } from "react-rnd";
 
 interface Kline {
@@ -20,34 +21,44 @@ interface SignalUnit {
   comment: string;
 }
 
+// define main react component
 const KlineChart: React.FC = () => {
+  // kline data state
   const [data, setData] = useState<Kline[]>([]);
+  // signal data state
   const [signals, setSignals] = useState<SignalUnit[]>([]);
+  // Plotly layout config
   const [layout, setLayout] = useState<any>({
-    title: "BTCUSDT 实时 1m K线图",
+    title: "BTCUSDT Kline Chart",
     xaxis: { type: "date" },
     yaxis: { autorange: true },
     dragmode: "zoom",
   });
+  // flag for first load
   const isInitialLoad = useRef(true);
 
+  // load historical kline data and connect WebSocket to get real time data
   useEffect(() => {
     axios.get("http://localhost:8080/api/kline")
       .then(res => setData(res.data))
       .catch(console.error);
 
     const ws = new WebSocket("ws://localhost:8080/ws/kline");
-    ws.onmessage = (event) => {
+    
+	ws.onmessage = (event) => {
       try {
         const newPoint: Kline = JSON.parse(event.data);
         setData(prev => {
           const updated = [...prev];
           const last = updated[updated.length - 1];
+		  // replace last bar if timestamp matches
           if (last && last.timestamp === newPoint.timestamp) {
-            updated[updated.length - 1] = newPoint;
+			updated[updated.length - 1] = newPoint;
+		  // else add new bar
           } else {
             updated.push(newPoint);
-            if (updated.length > 50) updated.shift();
+            // keep max 50 bars
+			if (updated.length > 50) updated.shift();
           }
           return updated;
         });
@@ -55,10 +66,11 @@ const KlineChart: React.FC = () => {
         console.error("Invalid WS data", e);
       }
     };
+	// close WebSocket on unmount
     return () => ws.close();
   }, []);
 
-  // 拉取所有信号数据
+  // fetch signal data periodically
   useEffect(() => {
     const fetchSignals = () => {
       axios.get("http://localhost:8080/api/signals")
@@ -66,11 +78,13 @@ const KlineChart: React.FC = () => {
         .catch(console.error);
     };
     fetchSignals();
-    // 定时刷新信号
+    // refresh every 5 seconds
     const interval = setInterval(fetchSignals, 5000);
-    return () => clearInterval(interval);
+    // cleanup on unmount
+	return () => clearInterval(interval);
   }, []);
 
+  // handle user relaylout event
   const handleRelayout = (event: any) => {
     if (!isInitialLoad.current) {
       setLayout((prevLayout: any) => ({
@@ -80,16 +94,19 @@ const KlineChart: React.FC = () => {
     }
   };
 
+  // mark as loaded only when data exists
   useEffect(() => {
     if (data.length > 0) {
       isInitialLoad.current = false;
     }
   }, [data]);
 
-  // 转换信号为Plotly annotations
+  // convert signal list to Plotly annotations
   const annotations = signals.map(sig => ({
+	// convert timestamp to date
     x: new Date(Number(sig.timestamp)),
-    y: sig.value ? Number(sig.value) : undefined,
+	y: sig.value ? Number(sig.value) : undefined,
+	// display text
     text: `${sig.symbol}: ${sig.value}\n${sig.comment || ""}`,
     showarrow: true,
     arrowhead: 4,
@@ -100,6 +117,7 @@ const KlineChart: React.FC = () => {
     font: { color: "#1976d2", size: 12 },
   }));
 
+  // Rnd enclosure
   return (
     <Rnd
       default={{
@@ -114,7 +132,6 @@ const KlineChart: React.FC = () => {
       dragHandleClassName="drag-handle"
     >
       <div style={{ display: "flex", flexDirection: "column", height: "100%", border: "1px solid #ddd", borderRadius: 4, background: "#fff" }}>
-        {/* 只有这个header区域可拖动 */}
         <div
           className="drag-handle"
           style={{
@@ -128,10 +145,9 @@ const KlineChart: React.FC = () => {
             borderTopRightRadius: 4,
           }}
         >
-          BTCUSDT 实时 1m K线图（拖动此区域移动）
+          BTCUSDT Kline Chart （drag this area to move）
         </div>
 
-        {/* 图表主体区域 */}
         <div style={{ flex: 1, minHeight: 0 }}>
           <Plot
             data={[

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Rnd } from "react-rnd";
+
 import axios from "axios";
+import { Rnd } from "react-rnd";
 
 const defaultSignal = {
   id: "",
@@ -12,36 +13,38 @@ const defaultSignal = {
 };
 
 const SignalDisplay: React.FC = () => {
+  // use state to store signal being edited
   const [signal, setSignal] = useState(defaultSignal);
-
+  // update signal state on input change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSignal({ ...signal, [e.target.name]: e.target.value });
   };
-
+  // handle submit to save signal via API
   const handleSubmit = async () => {
     try {
       await axios.post("http://localhost:8080/api/signal", signal);
       setSignal(defaultSignal);
-      alert("信号已提交！");
+      alert("Submission Successful");
     } catch (e) {
-      alert("提交失败");
+      alert("Submission Failed");
     }
   };
-
+  // delete signal by id
   const handleDelete = async () => {
     if (!signal.id) {
-      alert("请填写需要删除的信号ID");
+      alert("Please fill in the signal ID that needs to be deleted.");
       return;
     }
     try {
       await axios.delete(`http://localhost:8080/api/signal/${signal.id}`);
-      alert(`信号 ${signal.id} 已删除！`);
+      alert(`Signal ${signal.id} Deleted`);
       setSignal(defaultSignal);
     } catch (e) {
-      alert("删除失败或信号不存在");
+      alert("Deletion Failed or Signal Non-existent");
     }
   };
 
+  // Rnd enclosure
   return (
     <Rnd
       default={{
@@ -66,7 +69,7 @@ const SignalDisplay: React.FC = () => {
           overflow: "hidden",
         }}
       >
-        {/* 顶部可拖动条 */}
+
         <div
           className="drag-handle"
           style={{
@@ -78,10 +81,9 @@ const SignalDisplay: React.FC = () => {
             fontWeight: "bold",
           }}
         >
-          SignalUnit 输入（拖动此区域移动）
+          Signal Input （drag this area to move）
         </div>
 
-        {/* 表单区域 */}
         <div style={{ padding: 16, flex: 1, backgroundColor: "#f0f0f0" }}>
           <form style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {Object.keys(defaultSignal).map(key => (
@@ -112,7 +114,7 @@ const SignalDisplay: React.FC = () => {
                 marginTop: 8,
               }}
             >
-              提交信号
+              Submit Signal
             </button>
             <button
               type="button"
@@ -127,7 +129,7 @@ const SignalDisplay: React.FC = () => {
                 marginTop: 8,
               }}
             >
-              根据ID删除信号
+              Delete Signal (Only ID Needed)
             </button>
           </form>
         </div>
