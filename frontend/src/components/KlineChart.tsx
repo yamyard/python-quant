@@ -32,11 +32,11 @@ const KlineChart: React.FC = () => {
   const isInitialLoad = useRef(true);
 
   useEffect(() => {
-    axios.get("http://localhost:8000/api/kline")
+    axios.get("http://localhost:8080/api/kline")
       .then(res => setData(res.data))
       .catch(console.error);
 
-    const ws = new WebSocket("ws://localhost:8000/ws/kline");
+    const ws = new WebSocket("ws://localhost:8080/ws/kline");
     ws.onmessage = (event) => {
       try {
         const newPoint: Kline = JSON.parse(event.data);
@@ -61,7 +61,7 @@ const KlineChart: React.FC = () => {
   // 拉取所有信号数据
   useEffect(() => {
     const fetchSignals = () => {
-      axios.get("http://localhost:8000/api/signals")
+      axios.get("http://localhost:8080/api/signals")
         .then(res => setSignals(res.data))
         .catch(console.error);
     };
@@ -104,7 +104,7 @@ const KlineChart: React.FC = () => {
     <Rnd
       default={{
         x: 100,
-        y: 50,
+        y: -400,
         width: 800,
         height: 600,
       }}
@@ -150,6 +150,8 @@ const KlineChart: React.FC = () => {
               width: undefined,
               height: undefined,
               annotations: annotations,
+			  plot_bgcolor: "#e0e0e0",
+			  paper_bgcolor: "#f0f0f0",
             }}
             onRelayout={handleRelayout}
             useResizeHandler
