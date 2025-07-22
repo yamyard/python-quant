@@ -1,4 +1,5 @@
 from dataclasses import dataclass, asdict
+import json
 
 @dataclass
 class SignalUnit:
@@ -15,3 +16,6 @@ class SignalUnit:
     @classmethod
     def from_dict(cls, d):
         return cls(**d)
+
+    def to_json(self):
+        return json.dumps(self.to_dict())
