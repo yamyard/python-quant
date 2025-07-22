@@ -18,7 +18,7 @@ python-quant/
 │   └── ...
 ├── README.md
 ├── main.py
-└── requirement.txt
+└── requirements.txt
 ```
 
 
