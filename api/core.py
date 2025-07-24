@@ -21,6 +21,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# create a set of clients
 clients = set()
 
 BINANCE_WS_URL = "wss://stream.binance.com:9443/ws/btcusdt@kline_1m"
