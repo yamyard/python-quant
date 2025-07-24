@@ -1,8 +1,6 @@
-from dataclasses import dataclass, asdict
-import json
+from pydantic import BaseModel
 
-@dataclass
-class SignalUnit:
+class SignalUnit(BaseModel):
     id: str
     symbol: str
     value: str
@@ -11,11 +9,11 @@ class SignalUnit:
     comment: str
 
     def to_dict(self):
-        return asdict(self)
+        return self.model_dump()
 
     @classmethod
     def from_dict(cls, d):
         return cls(**d)
 
     def to_json(self):
-        return json.dumps(self.to_dict())
+        return self.model_dump_json()
