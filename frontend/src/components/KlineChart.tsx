@@ -43,7 +43,7 @@ const KlineChart: React.FC = () => {
       .then(res => setData(res.data))
       .catch(console.error);
 
-    const ws = new WebSocket("ws://localhost:8080/ws/kline");
+    const ws = new WebSocket("ws://localhost:8080/api/ws/kline");
     
 	ws.onmessage = (event) => {
       try {
