@@ -16,16 +16,8 @@ app.add_middleware(
 )
 
 # register routers
-app.include_router(
-    kline.router,
-    prefix="/api",
-    tags=["kline"],
-)
-app.include_router(
-    signal.router,
-    prefix="/api",
-    tags=["signal"],
-)
+app.include_router(kline.router, prefix="/api", tags=["kline"])
+app.include_router(signal.router, prefix="/api", tags=["signal"])
 
 # startup event
 @app.on_event("startup")
