@@ -25,12 +25,20 @@ const placeholderMap: { [key: string]: string } = {
 const SignalDisplay: React.FC = () => {
   // use state to store signal being edited
   const [signal, setSignal] = useState(defaultSignal);
+
   // update signal state on input change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSignal({ ...signal, [e.target.name]: e.target.value });
   };
+
   // handle submit to save signal via API
   const handleSubmit = async () => {
+	// check if fill signal id first
+	if (signal.id.trim() === "") {
+		alert("Please fill in the Signal ID before submitting.");
+		return;
+	}
+	// submitting
     try {
       await axios.post("http://localhost:8080/api/signal", signal);
       setSignal(defaultSignal);
@@ -39,6 +47,7 @@ const SignalDisplay: React.FC = () => {
       alert("Submission Failed");
     }
   };
+
   // delete signal by id
   const handleDelete = async () => {
     if (!signal.id) {
