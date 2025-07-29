@@ -5,18 +5,18 @@ import SignalDisplay from './components/SignalDisplay';
 import TickerSymbol from './components/TickerSymbol';
 
 function App() {
-  // add symbol state, default as BTCUSDT
-  const [symbol, setSymbol] = useState('BTCUSDT');
+	// add symbol state, default as BTCUSDT
+	const [symbol, setSymbol] = useState('BTCUSDT');
 
-  return (
-    <Container>
-      {/* pass symbol to KlineChart, with using key to force reload component */}
-      <KlineChart symbol={symbol} key={symbol} />
-      {/* pass symbol and setSymbol to TickerSymbol */}
-      <TickerSymbol currentSymbol={symbol} onSymbolChange={setSymbol} />
-	  <SignalDisplay />
-    </Container>
-  );
+	return (
+		<Container>
+			{/* pass symbol to KlineChart, with using key to force reload component */}
+			<KlineChart symbol={symbol} key={symbol} />
+			{/* pass symbol and setSymbol to TickerSymbol */}
+			<TickerSymbol currentSymbol={symbol} onSymbolChange={setSymbol} />
+			<SignalDisplay />
+		</Container>
+	);
 }
 
 export default App;
