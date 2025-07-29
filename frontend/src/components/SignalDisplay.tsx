@@ -12,6 +12,16 @@ const defaultSignal = {
   comment: ""
 };
 
+// a placeholder hint for each field
+const placeholderMap: { [key: string]: string } = {
+  id: "Signal ID",
+  symbol: "Ticker Symbol",
+  value: "Signal Value",
+  timestamp: "Timestamp (e.g., 2034-09-29T13:45)",
+  source: "Signal Source",
+  comment: "Some Comment",
+};
+
 const SignalDisplay: React.FC = () => {
   // use state to store signal being edited
   const [signal, setSignal] = useState(defaultSignal);
@@ -91,9 +101,10 @@ const SignalDisplay: React.FC = () => {
                 key={key}
                 name={key}
                 value={signal[key as keyof typeof signal]}
-                placeholder={key}
+                placeholder={placeholderMap[key] || key}
                 onChange={handleChange}
                 style={{
+				  color: "black",
                   padding: 8,
                   borderRadius: 4,
                   border: "1px solid #ccc",

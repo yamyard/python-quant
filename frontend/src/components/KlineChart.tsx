@@ -21,6 +21,21 @@ interface SignalUnit {
   comment: string;
 }
 
+// calculate MA line
+function calculateMA(data: Kline[], windowSize: number): (number | null)[] {
+  const result: (number | null)[] = [];
+  for (let i = 0; i < data.length; i++) {
+    if (i < windowSize - 1) {
+      result.push(null);
+    } else {
+      const slice = data.slice(i - windowSize + 1, i + 1);
+      const avg = slice.reduce((sum, d) => sum + d.close, 0) / windowSize;
+      result.push(avg);
+    }
+  }
+  return result;
+}
+
 // define main react component
 const KlineChart: React.FC = () => {
   // kline data state
@@ -57,8 +72,8 @@ const KlineChart: React.FC = () => {
 		  // else add new bar
           } else {
             updated.push(newPoint);
-            // keep max 50 bars
-			if (updated.length > 50) updated.shift();
+            // keep max 200 bars
+			if (updated.length > 200) updated.shift();
           }
           return updated;
         });
@@ -101,21 +116,44 @@ const KlineChart: React.FC = () => {
     }
   }, [data]);
 
+  // convert signal list to Plotly shapes
+  const shapes = signals.map(sig => ({
+	// convert timestamp to date
+	type: "line",
+    x0: new Date(sig.timestamp),
+	x1: new Date(sig.timestamp),
+	y0: 0,
+	y1: 1,
+	xref: "x",
+	yref: "paper",
+	// display a vertical line
+	line: {
+		color: "#1976d2",
+		width: 2,
+	},
+  }));
+
   // convert signal list to Plotly annotations
   const annotations = signals.map(sig => ({
 	// convert timestamp to date
-    x: new Date(Number(sig.timestamp)),
-	y: sig.value ? Number(sig.value) : undefined,
+    x: new Date(sig.timestamp),
+	y: 0.05,
+	xref: "x",
+	yref: "paper",
 	// display text
-    text: `${sig.symbol}: ${sig.value}\n${sig.comment || ""}`,
-    showarrow: true,
-    arrowhead: 4,
-    ax: 0,
-    ay: -40,
+	text: `Value: ${sig.value || ""}<br>Source: ${sig.source || ""}<br>Comment: ${sig.comment || ""}`,
+	align: "left",
+	showarrow: false,
+	xanchor: "left",
     bgcolor: "#ffe082",
     bordercolor: "#1976d2",
     font: { color: "#1976d2", size: 12 },
   }));
+
+  // MA7, MA25, MA99 support
+  const ma7 = calculateMA(data, 7);
+  const ma25 = calculateMA(data, 25);
+  const ma99 = calculateMA(data, 99);
 
   // Rnd enclosure
   return (
@@ -158,13 +196,42 @@ const KlineChart: React.FC = () => {
                 low: data.map(d => d.low),
                 close: data.map(d => d.close),
                 type: "candlestick",
-              }
+				name: "CandleStick",
+              },
+              // MA7 line
+              {
+                x: data.map(d => new Date(d.timestamp)),
+                y: ma7,
+                type: "scatter",
+                mode: "lines",
+                name: "MA7",
+                line: { color: "#f8b800", width: 1 },
+              },
+              // MA25 line
+              {
+                x: data.map(d => new Date(d.timestamp)),
+                y: ma25,
+                type: "scatter",
+                mode: "lines",
+                name: "MA25",
+                line: { color: "#ce3f87", width: 1 },
+              },
+              // MA99 line
+              {
+                x: data.map(d => new Date(d.timestamp)),
+                y: ma99,
+                type: "scatter",
+                mode: "lines",
+                name: "MA99",
+                line: { color: "#5155c7", width: 1 },
+              },
             ]}
             layout={{
               ...layout,
               autosize: true,
               width: undefined,
               height: undefined,
+			  shapes: shapes,
               annotations: annotations,
 			  plot_bgcolor: "#e0e0e0",
 			  paper_bgcolor: "#f0f0f0",

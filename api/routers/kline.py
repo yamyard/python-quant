@@ -15,7 +15,7 @@ BINANCE_WS_URL = "wss://stream.binance.com:9443/ws/btcusdt@kline_1m"
 # fetch kline historical data via Binace REST API
 @router.get("/kline")
 # default limit as 50
-def get_initial_kline(limit: int = 50):
+def get_initial_kline(limit: int = 200):
     url = "https://api.binance.com/api/v3/klines"
     params = {
         "symbol": "BTCUSDT",
