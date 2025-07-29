@@ -37,28 +37,37 @@ function calculateMA(data: Kline[], windowSize: number): (number | null)[] {
 }
 
 // define main react component
-const KlineChart: React.FC = () => {
+const KlineChart: React.FC<{ symbol: string }> = ({ symbol }) => {
   // kline data state
   const [data, setData] = useState<Kline[]>([]);
   // signal data state
   const [signals, setSignals] = useState<SignalUnit[]>([]);
   // Plotly layout config
   const [layout, setLayout] = useState<any>({
-    title: "BTCUSDT Kline Chart",
+    title: "{symbol} Kline Chart",
     xaxis: { type: "date" },
     yaxis: { autorange: true },
     dragmode: "zoom",
   });
   // flag for first load
   const isInitialLoad = useRef(true);
-
+  // check WebSocket
+  const wsRef = useRef<WebSocket | null>(null);
+  
   // load historical kline data and connect WebSocket to get real time data
   useEffect(() => {
-    axios.get("http://localhost:8080/api/kline")
-      .then(res => setData(res.data))
+	let ignore = false;
+	// get date with ticker symbol
+    axios.get("http://localhost:8080/api/kline", { params: { symbol } })
+      .then(res => {
+		if (!ignore) setData(res.data);
+	  })
       .catch(console.error);
 
-    const ws = new WebSocket("ws://localhost:8080/api/ws/kline");
+	// restart WebSocket on ticker symbol
+	if (wsRef.current) wsRef.current.close();
+    const ws = new WebSocket("ws://localhost:8080/api/ws/kline?symbol=" + symbol);
+	wsRef.current = ws;
     
 	ws.onmessage = (event) => {
       try {
@@ -82,8 +91,19 @@ const KlineChart: React.FC = () => {
       }
     };
 	// close WebSocket on unmount
-    return () => ws.close();
-  }, []);
+    return () => {
+		ignore = true;
+		ws.close();
+	};
+  }, [symbol]);
+  
+  // 测试文本
+  useEffect(() => {
+    setLayout((prev: any) => ({
+      ...prev,
+      title: `${symbol} Kline Chart`
+    }));
+  }, [symbol]);
 
   // fetch signal data periodically
   useEffect(() => {
