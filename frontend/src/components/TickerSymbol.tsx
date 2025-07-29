@@ -21,12 +21,12 @@ const TickerSymbol: React.FC<TickerSymbolProps> = ({ onSymbolChange, currentSymb
     setLoading(true);
     setMessage("");
     try {
-      // 通知后端变更交易对
+      // inform the backend about the ticker symbol change
       await axios.post("http://localhost:8080/api/kline-symbol", { symbol: input });
       onSymbolChange(input);
-      setMessage("已切换为：" + input);
+      setMessage("Switched to " + input + ".");
     } catch (err) {
-      setMessage("切换失败，请重试！");
+      setMessage("Switch failed.");
     } finally {
       setLoading(false);
     }
@@ -35,65 +35,90 @@ const TickerSymbol: React.FC<TickerSymbolProps> = ({ onSymbolChange, currentSymb
   return (
     <Rnd
       default={{
-        x: 200,
-        y: -200,
+        x: 960,
+        y: -400,
         width: 350,
-        height: 140,
+        height: 220,
       }}
       minWidth={300}
-      minHeight={100}
+      minHeight={120}
       bounds="window"
       dragHandleClassName="drag-handle"
     >
-      <div style={{ display: "flex", flexDirection: "column", height: "100%", border: "1px solid #ddd", borderRadius: 4, background: "#fff" }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
+          border: "1px solid #ddd",
+          borderRadius: 4,
+          background: "#fff",
+          overflow: "hidden",
+        }}
+      >
         <div
           className="drag-handle"
           style={{
             cursor: "move",
-            backgroundColor: "#1976d2",
+            backgroundColor: "#800080",
             color: "white",
             padding: "8px 16px",
             userSelect: "none",
             fontWeight: "bold",
-            borderTopLeftRadius: 4,
-            borderTopRightRadius: 4,
           }}
         >
-          选择币安交易对（拖拽此处移动）
+          Ticker Symbol Input （drag this area to move）
         </div>
-        <form
-          onSubmit={handleSubmit}
-          style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}
-        >
-          <label style={{ marginBottom: 8 }}>
-            请输入币安交易对（如 BTCUSDT）:
-          </label>
-          <input
-            type="text"
-            value={input}
-            onChange={handleInputChange}
-            style={{
-              fontSize: 18,
-              padding: "4px 8px",
-              borderRadius: 4,
-              border: "1px solid #aaa",
-              width: 180,
-              textTransform: "uppercase",
-            }}
-            maxLength={15}
-            disabled={loading}
-          />
-          <button
-            type="submit"
-            style={{ marginTop: 10, padding: "4px 16px", borderRadius: 4, background: "#1976d2", color: "#fff", border: "none", fontWeight: "bold", cursor: "pointer" }}
-            disabled={loading}
-          >
-            {loading ? "切换中..." : "切换"}
-          </button>
-          {message && (
-            <div style={{ marginTop: 10, color: "#1976d2" }}>{message}</div>
-          )}
-        </form>
+		
+		<div style={{ padding: 16, flex: 1, backgroundColor: "#f0f0f0" }}>
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <input
+              type="text"
+              value={input}
+              onChange={handleInputChange}
+              placeholder="(e.g., BTCUSDT)"
+              style={{
+                color: "black",
+                padding: 8,
+                borderRadius: 4,
+                border: "1px solid #ccc",
+                backgroundColor: "#fff",
+                textTransform: "uppercase",
+              }}
+              maxLength={15}
+              disabled={loading}
+            />
+            <button
+              type="submit"
+              style={{
+                padding: 8,
+                backgroundColor: "#008000",
+                color: "#fff",
+                borderRadius: 4,
+                border: "none",
+                fontWeight: "bold",
+              }}
+              disabled={loading}
+            >
+              Switch Ticker
+            </button>
+            {message && (
+				<div
+					style={{
+						padding: 8,
+						backgroundColor: "#e3f2fd",
+						color: "#1976d2",
+						borderRadius: 4,
+						border: "1px solid #1976d2",
+						fontWeight: "bold",
+						userSelect: "none",
+					}}
+				>
+					{message}
+				</div>
+            )}
+          </form>
+        </div>
       </div>
     </Rnd>
   );

@@ -79,7 +79,6 @@ const SignalDisplay: React.FC = () => {
           overflow: "hidden",
         }}
       >
-
         <div
           className="drag-handle"
           style={{

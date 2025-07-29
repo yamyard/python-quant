@@ -97,7 +97,7 @@ const KlineChart: React.FC<{ symbol: string }> = ({ symbol }) => {
 	};
   }, [symbol]);
   
-  // 测试文本
+  // rename title
   useEffect(() => {
     setLayout((prev: any) => ({
       ...prev,
@@ -161,7 +161,7 @@ const KlineChart: React.FC<{ symbol: string }> = ({ symbol }) => {
 	xref: "x",
 	yref: "paper",
 	// display text
-	text: `Value: ${sig.value || ""}<br>Source: ${sig.source || ""}<br>Comment: ${sig.comment || ""}`,
+	text: `ID: ${sig.id || ""}<br>Value: ${sig.value || ""}<br>Source: ${sig.source || ""}<br>Comment: ${sig.comment || ""}`,
 	align: "left",
 	showarrow: false,
 	xanchor: "left",
@@ -189,7 +189,17 @@ const KlineChart: React.FC<{ symbol: string }> = ({ symbol }) => {
       bounds="window"
       dragHandleClassName="drag-handle"
     >
-      <div style={{ display: "flex", flexDirection: "column", height: "100%", border: "1px solid #ddd", borderRadius: 4, background: "#fff" }}>
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          height: "100%",
+          border: "1px solid #ddd",
+          borderRadius: 4,
+          background: "#fff",
+          overflow: "hidden",
+        }}
+      >
         <div
           className="drag-handle"
           style={{
