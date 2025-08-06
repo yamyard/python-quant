@@ -98,7 +98,7 @@ const AccountModule: React.FC = () => {
     return (
         <Rnd
             default={{
-                x: 960,
+                x: 920,
                 y: -120,
                 width: 400,
                 height: 320,

@@ -179,7 +179,7 @@ const KlineChart: React.FC<{ symbol: string }> = ({ symbol }) => {
     return (
         <Rnd
             default={{
-                x: 100,
+                x: 60,
                 y: -400,
                 width: 800,
                 height: 600,

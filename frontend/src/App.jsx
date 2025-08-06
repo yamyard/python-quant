@@ -4,6 +4,7 @@ import KlineChart from './components/KlineChart';
 import SignalDisplay from './components/SignalDisplay';
 import TickerSymbol from './components/TickerSymbol';
 import AccountModule from './components/AccountModule';
+import BacktestModule from './components/BacktestModule';
 
 function App() {
 	// add symbol state, default as BTCUSDT
@@ -17,6 +18,7 @@ function App() {
 			<TickerSymbol currentSymbol={symbol} onSymbolChange={setSymbol} />
 			<SignalDisplay />
 			<AccountModule />
+			<BacktestModule />
 		</Container>
 	);
 }

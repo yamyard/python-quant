@@ -67,7 +67,7 @@ const SignalDisplay: React.FC = () => {
     return (
         <Rnd
             default={{
-                x: 100,
+                x: 60,
                 y: 260,
                 width: 400,
                 height: 420,
