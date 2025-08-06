@@ -37,7 +37,7 @@ const TickerSymbol: React.FC<TickerSymbolProps> = ({ onSymbolChange, currentSymb
             default={{
                 x: 960,
                 y: -400,
-                width: 350,
+                width: 400,
                 height: 220,
             }}
             minWidth={300}

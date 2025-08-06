@@ -1,19 +1,20 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Rnd } from "react-rnd";
+import yaml from "js-yaml";
 
 // 默认账户结构
 const defaultAccount = {
     user_id: "",
     cash: "",
-    shares: "" // shares字段支持JSON字符串，如 {"AAPL": 10}
+    shares: ""
 };
 
 // 每个字段的占位提示
 const placeholderMap: { [key: string]: string } = {
     user_id: "User ID",
     cash: "Initial Cash (e.g. 10000)",
-    shares: "Shares (JSON, e.g. {\"AAPL\": 10})"
+    shares: "Shares (YAML or JSON, optional)"
 };
 
 const AccountModule: React.FC = () => {
@@ -22,6 +23,20 @@ const AccountModule: React.FC = () => {
     // 输入变更时更新账户状态
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setAccount({ ...account, [e.target.name]: e.target.value });
+    };
+
+    // 将 shares 字段解析为对象（优先尝试 YAML，失败后尝试 JSON）
+    const parseShares = (input: string): any => {
+        if (!input.trim()) return {};
+        try {
+            return yaml.load(input);
+        } catch {
+            try {
+                return JSON.parse(input);
+            } catch {
+                throw new Error("Shares must be valid YAML or JSON.");
+            }
+        }
     };
 
     // 提交账户信息
@@ -37,9 +52,9 @@ const AccountModule: React.FC = () => {
         let sharesValue = {};
         if (account.shares.trim() !== "") {
             try {
-                sharesValue = JSON.parse(account.shares);
-            } catch {
-                alert("Shares must be a valid JSON string.");
+                sharesValue = parseShares(account.shares);
+            } catch (err: any) {
+                alert(err.message);
                 return;
             }
         }
@@ -74,10 +89,10 @@ const AccountModule: React.FC = () => {
     return (
         <Rnd
             default={{
-                x: 160,
-                y: 300,
+                x: 960,
+                y: -120,
                 width: 400,
-                height: 300,
+                height: 320,
             }}
             minWidth={300}
             minHeight={180}
@@ -99,7 +114,7 @@ const AccountModule: React.FC = () => {
                     className="drag-handle-account"
                     style={{
                         cursor: "move",
-                        backgroundColor: "#2196f3",
+                        backgroundColor: "#424242",
                         color: "white",
                         padding: "8px 16px",
                         userSelect: "none",
