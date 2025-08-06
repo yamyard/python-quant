@@ -14,11 +14,7 @@ class Account(BaseModel):
         return cls(**d)
     def to_json(self):
         return self.model_dump_json()
-
-    # create new account
-    def new_account(user_id: str, initial_cash: float) -> Account:
-        return Account(user_id=user_id, cash=initial_cash)
-    
+  
     # modify shares
     def add_shares(self, symbol: str, amount: int):
         self.shares[symbol] = self.shares.get(symbol, 0) + amount
