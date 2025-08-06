@@ -1,3 +1,3 @@
 - [ ] Build a Backtesting Module.
-
-
+ - Manual Mode: Input parameters related to limit orders, generate signals (source: manual), and submit the signals to the broker.
+ - Automatic Mode: Input parameters (price upper/lower bounds, strategy valid time) to the strategy, which then generates signals (source: auto), and submits them to the broker.
