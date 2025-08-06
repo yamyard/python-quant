@@ -1,3 +1,3 @@
-- [ ] Build a Backtest Module
+- [ ] Build a Backtesting Module.
 
 
